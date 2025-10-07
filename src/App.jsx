@@ -9,10 +9,9 @@ const IntialValue = {
   name: "",
   mobileNumber: "",
   address: "",
-  productDescription: "",
   amount: "",
-  tax: "",
-  discount: "",
+  ainw: "",
+  ap: "",
   paymentMethod: "",
   notes: ""
 };

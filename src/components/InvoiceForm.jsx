@@ -1,4 +1,32 @@
+import { useState } from "react";
+
+const initialProductRow = {
+  description: "",
+  hsnSac: "",
+  qty: "",
+  taxableValue: "",
+  cgst: "",
+  sgst: "",
+  total: ""
+};
+
 const InvoiceForm = ({ onSubmit, onChange }) => {
+  const [productRows, setProductRows] = useState([{ ...initialProductRow }]);
+
+  const handleProductChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedRows = productRows.map((row, i) =>
+      i === index ? { ...row, [name]: value } : row
+    );
+    setProductRows(updatedRows);
+    // Optionally, call a parent onChange with all productRows
+    if (onChange) onChange({ target: { name: "productRows", value: updatedRows } });
+  };
+
+  const addProductRow = () => {
+    setProductRows([...productRows, { ...initialProductRow }]);
+  };
+
   return (
     <>
       <h1 className="text-3xl font-bold uppercase text-center mt-10 text-gray-800">
@@ -10,7 +38,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
           onSubmit={onSubmit}
           className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-10 flex flex-col gap-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className=" flex flex-col gap-4">
             <div>
               <label className="text-gray-700 font-medium">Invoice No.</label>
               <input
@@ -65,18 +93,94 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="text-gray-700 font-medium">
-                Product/Service Description
-              </label>
-              <textarea
-                onChange={onChange}
-                name="productDescription"
-                placeholder="Enter description"
-                rows={4}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            {productRows.map((row, idx) => (
+              <div key={idx} className="md:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+                <div>
+                  <label className="text-gray-700 font-medium">Description</label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={row.description}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="Product Name"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">HSN/SAC</label>
+                  <input
+                    type="text"
+                    name="hsnSac"
+                    value={row.hsnSac}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="HSN/SAC"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">Qty</label>
+                  <input
+                    type="number"
+                    name="qty"
+                    value={row.qty}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="Qty"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">Taxable Value</label>
+                  <input
+                    type="text"
+                    name="taxableValue"
+                    value={row.taxableValue}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="Taxable Value"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">CGST</label>
+                  <input
+                    type="text"
+                    name="cgst"
+                    value={row.cgst}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="CGST"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">SGST</label>
+                  <input
+                    type="text"
+                    name="sgst"
+                    value={row.sgst}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="SGST"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">Total</label>
+                  <input
+                    type="number"
+                    name="total"
+                    value={row.total}
+                    onChange={e => handleProductChange(idx, e)}
+                    placeholder="Total"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addProductRow}
+              className="mt-2 block bg-green-500 text-white px-3 py-1 rounded w-fit"
+            >
+              + Add Row
+            </button>
 
             <div>
               <label className="text-gray-700 font-medium">Amount</label>
@@ -90,27 +194,36 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
             </div>
 
             <div>
-              <label className="text-gray-700 font-medium">Tax (%)</label>
+              <label className="text-gray-700 font-medium"> Amount in words</label>
               <input
                 onChange={onChange}
-                type="number"
-                name="tax"
-                placeholder="Enter tax"
+                type="text"
+                name="ainw"
+                placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="text-gray-700 font-medium">Discount (%)</label>
+              <label className="text-gray-700 font-medium">Amount Paid</label>
               <input
                 onChange={onChange}
-                type="number"
+                type="text"
                 name="discount"
-                placeholder="Enter discount"
+                placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
+  <div>
+              <label className="text-gray-700 font-medium">Amount Due</label>
+              <input
+                onChange={onChange}
+                type="text"
+                name="ap"
+                placeholder="Enter Amount"
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
             <div>
               <label className="text-gray-700 font-medium">
                 Payment Method
