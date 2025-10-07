@@ -3,8 +3,8 @@ import React from 'react'
 const Invoice = () => {
   return (
     <>
-    <div className='relative '><img src="form.jpg" className='  ' alt="" style={{ width: '210mm', height: '297mm', boxSizing: 'border-box' }}></img></div>
-  <section className='mx-auto m-5 px-8 py-20  absolute top-40' style={{ width: '210mm', height: '297mm', boxSizing: 'border-box' }}>
+    <div className=' z-10 '><img src="form.jpg" className='  ' alt="" style={{ width: '210mm', height: '297mm', boxSizing: 'border-box' }}></img></div>
+  <section className='mx-auto m-5 px-8 py-20 absolute top-40' style={{ width: '210mm', height: '297mm', boxSizing: 'border-box' }}>
     
       
        <h3 className='font-bold'>Billed To:</h3>
