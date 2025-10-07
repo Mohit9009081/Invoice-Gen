@@ -1,36 +1,4 @@
-import { useState } from "react";
-
-const IntialValue = {
-  invoiceNo: "",
-  date: "",
-  name: "",
-  mobileNumber: "",
-  address: "",
-  productDescription: "",
-  amount: "",
-  tax: "",
-  discount: "",
-  paymentMethod: "",
-  notes: ""
-};
-
-const InvoiceForm = () => {
-  const [formData, setFormData] = useState(IntialValue);
-
-  const onChange = (e) => {
-    const InputName = e.target.name;
-    const InputValue = e.target.value;
-    const updated = { ...formData, [InputName]: InputValue };
-    setFormData(updated);
-    localStorage.setItem("invoice", JSON.stringify(updated));
-    console.log({ ...formData, [InputName]: InputValue });
-  };
-
-  const onFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("form submitted", formData);
-  };
-
+const InvoiceForm = ({ onSubmit, onChange }) => {
   return (
     <>
       <h1 className="text-3xl font-bold uppercase text-center mt-10 text-gray-800">
@@ -39,7 +7,7 @@ const InvoiceForm = () => {
 
       <section className="p-6 md:p-12 lg:p-20">
         <form
-          onSubmit={onFormSubmit}
+          onSubmit={onSubmit}
           className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-10 flex flex-col gap-4"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

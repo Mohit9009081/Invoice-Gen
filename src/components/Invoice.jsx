@@ -1,12 +1,10 @@
-import React from 'react'
-
-const Invoice = () => {
+const Invoice = ({ data }) => {
   return (
     <div className="relative w-[210mm] h-[297mm] mx-auto shadow-lg">
       <img src="form.jpg" className='w-full h-full' alt="" />
       <div className='mx-auto m-5 px-8 py-20 z-10 absolute top-40'>
         <p className='font-bold'>Billed To:</p>
-        <p>Name: Shivam Dayma</p>
+        <p>Name: {data.name}</p>
         <p>Mobile: +91 9907472038 </p>
         <p className='mb-10'>Address: Bull streat , Bombay </p>
         <h3 className='font-bold'>Description of services:</h3>
@@ -67,4 +65,4 @@ const Invoice = () => {
   )
 }
 
-export default Invoice
+export default Invoice;

@@ -1,17 +1,46 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import InvoiceForm from './components/InvoiceForm'
 import Invoice from './components/Invoice'
 
+const IntialValue = {
+  invoiceNo: "",
+  date: "",
+  name: "",
+  mobileNumber: "",
+  address: "",
+  productDescription: "",
+  amount: "",
+  tax: "",
+  discount: "",
+  paymentMethod: "",
+  notes: ""
+};
+
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [formData, setFormData] = useState(IntialValue);
+
+  const onChange = (e) => {
+    const InputName = e.target.name;
+    const InputValue = e.target.value;
+    const updated = { ...formData, [InputName]: InputValue };
+    setFormData(updated);
+    localStorage.setItem("invoice", JSON.stringify(updated));
+    console.log({ ...formData, [InputName]: InputValue });
+  };
+
+  const onFormSubmit = (e) => {
+    e.preventDefault();
+    console.log("form submitted", formData);
+  };
+
+
 
   return (
     <>
-      <InvoiceForm />
-      <Invoice />
+      <InvoiceForm formData={formData} onSubmit={onFormSubmit} onChange={onChange} />
+      <Invoice data={formData} />
     </>
   )
 }
