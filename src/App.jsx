@@ -10,8 +10,9 @@ function App() {
 
   return (
     <>
-    {/* <InvoiceForm/> */}
-    <Invoice/>
-     </>
-  )}
+      <InvoiceForm />
+      <Invoice />
+    </>
+  )
+}
 export default App
