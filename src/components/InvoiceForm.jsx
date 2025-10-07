@@ -209,7 +209,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <input
                 onChange={onChange}
                 type="text"
-                name="discount"
+                name="amountPaid"
                 placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -219,7 +219,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <input
                 onChange={onChange}
                 type="text"
-                name="ap"
+                name="amountdue"
                 placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />

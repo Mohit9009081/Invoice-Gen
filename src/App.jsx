@@ -11,7 +11,8 @@ const IntialValue = {
   address: "",
   amount: "",
   ainw: "",
-  ap: "",
+  amountpaid:"",
+  amountdue: "",
   paymentMethod: "",
   notes: ""
 };
