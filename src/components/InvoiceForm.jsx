@@ -33,23 +33,26 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
       if (total && gstRate) {
         const totalNum = parseFloat(total);
         const gstNum = parseFloat(gstRate);
-        let taxableValue = 0, gstAmount = 0;
+        let taxableValue = 0, gstAmount = 0, cgst = 0, sgst = 0, newTotal = totalNum;
         if (gstType === "inclusive") {
           taxableValue = (totalNum / (1 + gstNum / 100));
           gstAmount = totalNum - taxableValue;
+          cgst = sgst = (gstAmount / 2).toFixed(2);
+          newTotal = totalNum;
         } else {
           taxableValue = totalNum;
           gstAmount = totalNum * (gstNum / 100);
+          cgst = sgst = (gstAmount / 2).toFixed(2);
+          newTotal = (totalNum + parseFloat(cgst) + parseFloat(sgst)).toFixed(2);
         }
-        const halfGst = (gstAmount / 2).toFixed(2);
         updatedRows[index] = {
           ...row,
-          total: total,
+          total: newTotal,
           gst: gstRate,
           gstType: gstType,
           taxableValue: taxableValue.toFixed(2),
-          cgst: halfGst,
-          sgst: halfGst
+          cgst: cgst,
+          sgst: sgst
         };
       }
     }
@@ -88,6 +91,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                 onChange={onChange}
                 type="text"
                 name="invoiceNo"
+                maxLength={12}
                 placeholder="Enter invoice no."
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -108,6 +112,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <input
                 onChange={onChange}
                 type="text"
+                maxLength={20}
                 name="name"
                 placeholder="Enter name"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -120,6 +125,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                 onChange={onChange}
                 type="tel"
                 name="mobileNumber"
+                maxLength={12}
                 placeholder="Enter mobile number"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -130,6 +136,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <textarea
                 onChange={onChange}
                 name="address"
+                maxLength={100}
                 placeholder="Enter address"
                 rows={4}
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -142,6 +149,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                   <label className="text-gray-700 font-medium">Product Description</label>
                   <input
                     type="text"
+                    maxLength={20}
                     name="description"
                     value={row.description}
                     onChange={e => handleProductChange(idx, e)}
@@ -153,6 +161,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                   <label className="text-gray-700 font-medium">HSN/SAC</label>
                   <input
                     type="text"
+                    maxLength={"8"}
                     name="hsnSac"
                     value={row.hsnSac}
                     onChange={e => handleProductChange(idx, e)}
@@ -176,6 +185,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                   <input
                     type="number"
                     name="total"
+                    maxLength={7}
                     value={row.total}
                     onChange={e => handleProductChange(idx, e)}
                     placeholder="Total"
@@ -244,15 +254,17 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                 </div>
                
 
-                <div className="md:col-span-4 text-right">
-                  <button
-                    type="button"
-                    onClick={() => removeProductRow(idx)}
-                    className="mt-1 inline-block text-red-600 bg-red-100 px-3 py-1 rounded"
-                  >
-                    Remove
-                  </button>
-                </div>
+                {productRows.length > 1 ? (
+                  <div className="md:col-span-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => removeProductRow(idx)}
+                      className="mt-1 inline-block text-red-600 bg-red-100 px-3 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
               </div>
             ))}
 
@@ -279,6 +291,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <label className="text-gray-700 font-medium"> Amount in words</label>
               <input
                 onChange={onChange}
+                maxLength={40}
                 type="text"
                 name="ainw"
                 placeholder="Enter Amount"
@@ -291,6 +304,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <input
                 onChange={onChange}
                 type="text"
+                maxLength={7}
                 name="amountPaid"
                 placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -301,6 +315,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
               <input
                 onChange={onChange}
                 type="text"
+                maxLength={7}
                 name="amountdue"
                 placeholder="Enter Amount"
                 className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -321,20 +336,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                 <option value="bank_transfer">Bank Transfer</option>
               </select>
             </div>
-            <div>
-              <label className="text-gray-700 font-medium">GST (%)</label>
-              <select
-                onChange={onChange}
-                name="gst"
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select GST</option>
-                <option value="5">5%</option>
-                <option value="12">12%</option>
-                <option value="18">18%</option>
-                <option value="28">28%</option>
-              </select>
-            </div>
+           
           </div>
 
           <div>

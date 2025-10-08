@@ -42,7 +42,7 @@ function App() {
     <>
       <InvoiceForm formData={formData} onSubmit={onFormSubmit} onChange={onChange} />
       <Invoice data={formData} />
-     
+ 
     </>
   )
 }
