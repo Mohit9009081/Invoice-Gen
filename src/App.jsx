@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import InvoiceForm from './components/InvoiceForm'
 import Invoice from './components/Invoice'
+import GSTCalculator from './components/GSTCalculator';
 
 const IntialValue = {
   invoiceNo: "",
@@ -41,6 +42,7 @@ function App() {
     <>
       <InvoiceForm formData={formData} onSubmit={onFormSubmit} onChange={onChange} />
       <Invoice data={formData} />
+     
     </>
   )
 }

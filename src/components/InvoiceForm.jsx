@@ -5,26 +5,69 @@ const initialProductRow = {
   hsnSac: "",
   qty: "",
   taxableValue: "",
+  gst: "",
+  gstType: "inclusive", // new field
   cgst: "",
   sgst: "",
   total: ""
 };
 
 const InvoiceForm = ({ onSubmit, onChange }) => {
-  const [productRows, setProductRows] = useState([{ ...initialProductRow }]);
+  const [productRows, setProductRows] = useState([{...initialProductRow }]);
 
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
-    const updatedRows = productRows.map((row, i) =>
+    let updatedRows = productRows.map((row, i) =>
       i === index ? { ...row, [name]: value } : row
     );
+
+    // Auto-calculate Taxable Value, GST, CGST, SGST if total, gst, or gstType changes
+    const row = updatedRows[index];
+    let total = row.total;
+    let gstRate = row.gst;
+    let gstType = row.gstType || "inclusive";
+    if (name === "total" || name === "gst" || name === "gstType") {
+      total = name === "total" ? value : row.total;
+      gstRate = name === "gst" ? value : row.gst;
+      gstType = name === "gstType" ? value : row.gstType || "inclusive";
+      if (total && gstRate) {
+        const totalNum = parseFloat(total);
+        const gstNum = parseFloat(gstRate);
+        let taxableValue = 0, gstAmount = 0;
+        if (gstType === "inclusive") {
+          taxableValue = (totalNum / (1 + gstNum / 100));
+          gstAmount = totalNum - taxableValue;
+        } else {
+          taxableValue = totalNum;
+          gstAmount = totalNum * (gstNum / 100);
+        }
+        const halfGst = (gstAmount / 2).toFixed(2);
+        updatedRows[index] = {
+          ...row,
+          total: total,
+          gst: gstRate,
+          gstType: gstType,
+          taxableValue: taxableValue.toFixed(2),
+          cgst: halfGst,
+          sgst: halfGst
+        };
+      }
+    }
+
     setProductRows(updatedRows);
-    // Optionally, call a parent onChange with all productRows
     if (onChange) onChange({ target: { name: "productRows", value: updatedRows } });
   };
 
   const addProductRow = () => {
     setProductRows([...productRows, { ...initialProductRow }]);
+  };
+
+  const removeProductRow = (index) => {
+    // keep at least one row
+    if (productRows.length === 1) return;
+    const updatedRows = productRows.filter((_, i) => i !== index);
+    setProductRows(updatedRows);
+    if (onChange) onChange({ target: { name: "productRows", value: updatedRows } });
   };
 
   return (
@@ -96,7 +139,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
             {productRows.map((row, idx) => (
               <div key={idx} className="md:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
                 <div>
-                  <label className="text-gray-700 font-medium">Description</label>
+                  <label className="text-gray-700 font-medium">Product Description</label>
                   <input
                     type="text"
                     name="description"
@@ -129,39 +172,6 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-gray-700 font-medium">Taxable Value</label>
-                  <input
-                    type="text"
-                    name="taxableValue"
-                    value={row.taxableValue}
-                    onChange={e => handleProductChange(idx, e)}
-                    placeholder="Taxable Value"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-700 font-medium">CGST</label>
-                  <input
-                    type="text"
-                    name="cgst"
-                    value={row.cgst}
-                    onChange={e => handleProductChange(idx, e)}
-                    placeholder="CGST"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-gray-700 font-medium">SGST</label>
-                  <input
-                    type="text"
-                    name="sgst"
-                    value={row.sgst}
-                    onChange={e => handleProductChange(idx, e)}
-                    placeholder="SGST"
-                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
                   <label className="text-gray-700 font-medium">Total</label>
                   <input
                     type="number"
@@ -172,8 +182,80 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                     className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+                <div>
+                  <label className="text-gray-700 font-medium">GST (%)</label>
+                  <select
+                    onChange={e => handleProductChange(idx, e)}
+                    value={row.gst}
+                    name="gst"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select GST</option>
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18">18%</option>
+                    <option value="28">28%</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">GST Type</label>
+                  <select
+                    name="gstType"
+                    value={row.gstType || "inclusive"}
+                    onChange={e => handleProductChange(idx, e)}
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="inclusive">Inclusive</option>
+                    <option value="exclusive">Exclusive</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">CGST</label>
+                  <input
+                    type="text"
+                    name="cgst"
+                    value={row.cgst}
+                    readOnly
+                    placeholder="CGST"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 font-medium">SGST</label>
+                  <input
+                    type="text"
+                    name="sgst"
+                    value={row.sgst}
+                    readOnly
+                    placeholder="SGST"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                  />
+                </div>
+                        <div>
+                  <label className="text-gray-700 font-medium">Taxable Value</label>
+                  <input
+                    type="text"
+                    name="taxableValue"
+                    value={row.taxableValue}
+                    readOnly
+                    placeholder="Taxable Value"
+                    className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
+                  />
+                </div>
+               
+
+                <div className="md:col-span-4 text-right">
+                  <button
+                    type="button"
+                    onClick={() => removeProductRow(idx)}
+                    className="mt-1 inline-block text-red-600 bg-red-100 px-3 py-1 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
+
             <button
               type="button"
               onClick={addProductRow}
@@ -237,6 +319,20 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
                 <option value="cash">Cash</option>
                 <option value="credit_card">Credit Card</option>
                 <option value="bank_transfer">Bank Transfer</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-gray-700 font-medium">GST (%)</label>
+              <select
+                onChange={onChange}
+                name="gst"
+                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select GST</option>
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18">18%</option>
+                <option value="28">28%</option>
               </select>
             </div>
           </div>
