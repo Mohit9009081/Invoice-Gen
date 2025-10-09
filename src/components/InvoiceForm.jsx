@@ -75,7 +75,7 @@ const InvoiceForm = ({ onSubmit, onChange }) => {
 
   return (
     <>
-      <main className="w-[210mm] mx-auto">
+      <main className="w-[410px] md:[210mm] mx-auto p-2 md:p-8">
         <h1 className="text-3xl font-bold uppercase text-center mt-10 text-gray-800">
         Invoice Form
       </h1>
